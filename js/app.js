@@ -1,23 +1,44 @@
-var app = {
+// const core = require('./core');
 
+var app = {
+  // values: {
+  //   min: 3,
+  //   max: 5
+  // },
   bankroll: 100,
+  cards: ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Valet', 'Dame', 'Roi', 'As'],
 
   /**
    * Cette fonction a pour but de commencer un nouveau tour en tirant 2 nombres aléatoires, puis met à jour les cartes en conséquence et masque l'élément résultat
    */
   newRound: function () {
     // Etape 2.1
-    // On commence par mettre à jour la propriété values de l'objet app avec un objet qui contient la valeur de la carte la plus basse et celle de la carte la plus haute
+    // On commence par mettre à jour la propriété 'value's de l'objet app avec un objet qui contient la valeur de la carte la plus basse et celle de la carte la plus haute
     // Pour cela assigne un objet dans app.values avec une propriété min qui a pour valeur 3 et une propriété max qui a pour valeur 5
-
+    app.values = core.getTwoNumbers(0, 12);
+    console.log(app.values);
+    const cardLowElement = document.getElementById('card_low');
+    const cardHighElement = document.getElementById('card_high');
+    const questionCardElement = document.getElementById('question');
+    const resultElement = document.getElementById('result');
+    
+    console.log( ' card low ', app.cards[app.values.min]);
+    console.log( ' card high ', app.cards[app.values.max]);
     // Etape 2.2
     // Puis écris en texte la valeur de la carte dans l'élément HTML qui représente la carte correspondante
+ 
+    // resultElement.style.display = "none";
     // Pour la carte du milieu, on va écrire "?" dedans (il faut attendre que le joueur mise pour tirer cette carte)
+    questionCardElement.innerHTML = '?';
     // Au final tu dois cibler chacun leur tour, les 3 cartes, pour modifier ensuite leur contenu textuel
-
+    
     // Etape 2.3
     // Pour finir, il faut masquer l'élément résultat, pense à bien le cibler avant de le masquer
     // Pour le masquer, applique lui la classe `hidden` qui est déjà présente dans le css
+    cardLowElement.classList.add(`val-${app.cards[app.values.min]}`);
+    cardHighElement.classList.add(`val-${app.cards[app.values.max]}`);
+    resultElement.classList.add('hidden');
+
   },
 
   /**
@@ -71,3 +92,4 @@ var app = {
 
 // Lorsque la page est totalement chargée, on lance la fonction app.init
 document.addEventListener('DOMContentLoaded', app.init);
+

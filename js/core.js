@@ -63,3 +63,5 @@ const core = {
     * Fin du code fourni. 
     **/
 };
+
+// module.exports = core{};
