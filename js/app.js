@@ -1,87 +1,115 @@
 // const core = require('./core');
 
 var app = {
-  // values: {
-  //   min: 3,
-  //   max: 5
-  // },
+  draw: [],
   bankroll: 100,
   cards: ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Valet', 'Dame', 'Roi', 'As'],
-
   /**
    * Cette fonction a pour but de commencer un nouveau tour en tirant 2 nombres aléatoires, puis met à jour les cartes en conséquence et masque l'élément résultat
    */
-  newRound: function () {
-    // Etape 2.1
-    // On commence par mettre à jour la propriété 'value's de l'objet app avec un objet qui contient la valeur de la carte la plus basse et celle de la carte la plus haute
-    // Pour cela assigne un objet dans app.values avec une propriété min qui a pour valeur 3 et une propriété max qui a pour valeur 5
-    app.values = core.getTwoNumbers(0, 12);
-    console.log(app.values);
+  updateCards: function () {
+    // clean text field
+    potElement = document.getElementById('pot');
+    potElement.innerHTML = '';
+
+    // defines cards value
     const cardLowElement = document.getElementById('card_low');
     const cardHighElement = document.getElementById('card_high');
-    const questionCardElement = document.getElementById('question');
+
+    // attributes corect css regarding numbers draw out
+    cardLowElement.className = `card val-${app.cards[app.values.min]}`;
+    cardHighElement.className = `card val-${app.cards[app.values.max]}`;
+
+  },
+  newRound: function () {
+    document.getElementById('potContainer').className = '';
+
     const resultElement = document.getElementById('result');
-    
-    console.log( ' card low ', app.cards[app.values.min]);
-    console.log( ' card high ', app.cards[app.values.max]);
-    // Etape 2.2
-    // Puis écris en texte la valeur de la carte dans l'élément HTML qui représente la carte correspondante
- 
-    // resultElement.style.display = "none";
-    // Pour la carte du milieu, on va écrire "?" dedans (il faut attendre que le joueur mise pour tirer cette carte)
-    questionCardElement.innerHTML = '?';
-    // Au final tu dois cibler chacun leur tour, les 3 cartes, pour modifier ensuite leur contenu textuel
-    
-    // Etape 2.3
-    // Pour finir, il faut masquer l'élément résultat, pense à bien le cibler avant de le masquer
-    // Pour le masquer, applique lui la classe `hidden` qui est déjà présente dans le css
-    cardLowElement.classList.add(`val-${app.cards[app.values.min]}`);
-    cardHighElement.classList.add(`val-${app.cards[app.values.max]}`);
+    document.getElementById('question').className = 'card__face';
+    document.getElementById('question--back').className = 'card';
+    // display pot if not first round
+    resultElement.className = '';
+
+    // initialize min and max values to generate cards accordingly
+    app.values = core.getTwoNumbers(0, 12);
+
+    app.updateCards();
+
+    // hides replay button
     resultElement.classList.add('hidden');
-
   },
 
-  /**
-   * Sera déclenché par la soumission d'un formulaire et obtiendra la valeur de l'input qui a l'id "pot". C'est la mise du joueur
-   */
-  handleInputSubmit: function (event) {
-    // Etape 5.1
-    // Cette fonction sera déclenchée par la soumission d'un formulaire. Enfin... quand tu l'auras branchée sur la soumission du formulaire 😈
-    // Essaye d'attacher un listener à ton formulaire dans app.init avant de continuer
-    // Un simple alert() te permettra de vérifier si ton formulaire est bien branché
-    
-    // Etape 5.2
-    // L'alert s'affiche ? Mais quand tu valides, la page s'actualise ? Commence par prévenir le rechargement de la page (qui est le comportement par défaut de ce genre d'event).
+  handleInputSubmit: function () {
 
-    // Etape 5.3
-    // Ensuite, récupère la valeur de l'input qui porte l'id "pot" ( la mise du joueur ), après l'avoir ciblé. Assure toi de transformer la valeur récuperée en nombre.
+    //get pot element then parse its value string into number
+    app.potElement = document.getElementById('pot');
+    app.potValue = parseInt(app.potElement.value, 10);
 
-    // Etape 5.4 (bonus)
-    // Il va falloir faire une série de vérification sur cette valeur: 
-    // - la valeur de la mise doit être un nombre entier
-    // - la valeur de la mise doit être nulle ou positive.
-    // - la mise ne peut pas être supérieur aux fonds du joueur (qu'on appelle souvent "bankroll") accessible via app.bankroll
-    // Si on entre dans un cas d'erreur, affiche une alerte avec un message cohérent.
+    // check for errors from user
+    if (app.potValue != parseInt(app.potValue, 10)) {
+      alert('Your bet must be a number.');
+    }
+    else if (app.potValue < 0) {
+      alert('Your bet must be greater or equal to zero.');
+    }
+    else if (app.potValue > app.bankroll) {
+      alert('Your bet must inferior or equal to your bankroll.');
+    }
 
-
-    // Si tout va bien ( et UNIQUEMENT dans ce cas), il faut lancer la fonction qui termine le round (que tu vas compléter à l'étape 6)
-    // Pense qu'elle attend en paramètre la valeur de la mise ( que tu viens de récupérer ) il faut donc lui passer un argument ;)
+    // if no error, proced to next step
+    else {
+      app.endCurrentRound();
+    }
   },
 
-  /**
-   * Termine le round en cours
-   */
-  endCurrentRound: function (potValue){
+  endCurrentRound: function (potValue) {
     // Etape 6 ici
+
+    const bankrollElement = document.getElementById('bankroll');
+
+    // generate one random number to define random card
+    app.randomNumber = core.getRandomNumber(0, 12);
+
+    // get unknown card
+    const questionCardElement = document.getElementById('question');
+
+    //display random card base on random number with the appropriate class
+    questionCardElement.className = `card card__face val-${app.cards[app.randomNumber]}`;
+    const flipperCardElement = document.querySelector('.flipperCard');
+    flipperCardElement.classList.toggle('is-flipped');
+
+    // winning cituation
+    if (app.randomNumber >= app.values.min && app.randomNumber <= app.values.max) {
+      app.bankroll -= app.potValue;
+      app.potValue *= 2;
+      app.bankroll += app.potValue;
+      bankrollElement.innerHTML = '';
+      bankrollElement.innerHTML = app.bankroll;
+      core.showResults(`You have won ${app.potValue /= 2} points.`);
+    }
+
+    // Losing cituation
+    else {
+      app.bankroll -= app.potValue;
+      bankrollElement.innerHTML = '';
+      bankrollElement.innerHTML = app.bankroll;
+      core.showResults(`You have lost ${app.potValue} points.`);
+    }
   },
 
 
-   /**
-   * Initialise l'application
-   */
+  /**
+  * Initialise l'application
+  */
   init: function () {
     // On accroche la fonction "newRound" au bouton "newRound".
     document.getElementById('newRound').addEventListener('click', app.newRound);
+
+    // sbmit listener
+    document.getElementById('submitPot').addEventListener('click', function (event) {
+      event.preventDefault();
+      app.handleInputSubmit();
+    });
 
     // Enfin, on lance le premier round !
     app.newRound();
