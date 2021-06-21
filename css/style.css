@@ -51,7 +51,7 @@ body {
   transform-style: preserve-3d; */
 }
 
-.flipperCard {
+.flipContainer {
   display: flex;
   justify-content: center;
   width: 100%;
@@ -64,7 +64,7 @@ body {
 .scene {
   width: auto;
   height: auto;
-  perspective: 600px;
+  perspective: 500px;
 }
 
 .card__face {
@@ -74,16 +74,26 @@ body {
   backface-visibility: hidden;
 }
 
-.card__face--back {
+.card__face--front {
   transform: rotateY( 180deg );
+  width: 81px;
+  height: 117px;
+  backface-visibility: hidden;
+
+}
+
+.card__face--back {
   background-image: url('../img/cards.gif');
   background-position: 0 118px;
   width: 81px;
   height: 117px;
   padding: 0;
+  backface-visibility: hidden;
+
 }
 
-.flipperCard.is-flipped {
+
+.flipContainer.is-flipped {
   transform: rotateY(180deg);
 }
 

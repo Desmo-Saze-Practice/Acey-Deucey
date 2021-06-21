@@ -1,12 +1,27 @@
 // const core = require('./core');
 
 var app = {
-  draw: [],
   bankroll: 100,
   cards: ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Valet', 'Dame', 'Roi', 'As'],
-  /**
-   * Cette fonction a pour but de commencer un nouveau tour en tirant 2 nombres aléatoires, puis met à jour les cartes en conséquence et masque l'élément résultat
-   */
+
+  newRound: function () {
+    // display pot allowing player to gamble
+    document.getElementById('potContainer').className = '';
+
+    const resultElement = document.getElementById('result');
+    document.getElementById('question--back').className = 'card card__face--back';
+    document.getElementById('question').className = `card card__face card__face--front val-${app.cards[app.randomNumber]}`;
+    resultElement.className = '';
+
+    // initialize min and max values to generate cards accordingly
+    app.values = core.getTwoNumbers(0, 12);
+
+    app.updateCards();
+
+    // hides replay button
+    resultElement.classList.add('hidden');
+  },
+
   updateCards: function () {
     // clean text field
     potElement = document.getElementById('pot');
@@ -19,24 +34,6 @@ var app = {
     // attributes corect css regarding numbers draw out
     cardLowElement.className = `card val-${app.cards[app.values.min]}`;
     cardHighElement.className = `card val-${app.cards[app.values.max]}`;
-
-  },
-  newRound: function () {
-    document.getElementById('potContainer').className = '';
-
-    const resultElement = document.getElementById('result');
-    document.getElementById('question').className = 'card__face';
-    document.getElementById('question--back').className = 'card';
-    // display pot if not first round
-    resultElement.className = '';
-
-    // initialize min and max values to generate cards accordingly
-    app.values = core.getTwoNumbers(0, 12);
-
-    app.updateCards();
-
-    // hides replay button
-    resultElement.classList.add('hidden');
   },
 
   handleInputSubmit: function () {
@@ -63,7 +60,6 @@ var app = {
   },
 
   endCurrentRound: function (potValue) {
-    // Etape 6 ici
 
     const bankrollElement = document.getElementById('bankroll');
 
@@ -74,8 +70,8 @@ var app = {
     const questionCardElement = document.getElementById('question');
 
     //display random card base on random number with the appropriate class
-    questionCardElement.className = `card card__face val-${app.cards[app.randomNumber]}`;
-    const flipperCardElement = document.querySelector('.flipperCard');
+    questionCardElement.className = `card card__face card__face--front val-${app.cards[app.randomNumber]}`;
+    const flipperCardElement = document.querySelector('.flipContainer');
     flipperCardElement.classList.toggle('is-flipped');
 
     // winning cituation
@@ -97,27 +93,27 @@ var app = {
     }
   },
 
-
-  /**
-  * Initialise l'application
-  */
   init: function () {
-    // On accroche la fonction "newRound" au bouton "newRound".
-    document.getElementById('newRound').addEventListener('click', app.newRound);
 
-    // sbmit listener
+    // first round
+    app.newRound();
+
+    // to submit player's bet
     document.getElementById('submitPot').addEventListener('click', function (event) {
       event.preventDefault();
       app.handleInputSubmit();
     });
+    
+    // on using "replay" button
+    document.getElementById('newRound').addEventListener('click', function() {
+      const flipperCardElement = document.querySelector('.flipContainer');
+      flipperCardElement.classList.toggle('is-flipped');
+      app.newRound();
+    });
 
-    // Enfin, on lance le premier round !
-    app.newRound();
   },
 
 };
 
-
-// Lorsque la page est totalement chargée, on lance la fonction app.init
 document.addEventListener('DOMContentLoaded', app.init);
 
